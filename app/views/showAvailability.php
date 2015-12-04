@@ -3,7 +3,7 @@ use Guzzle\Http\Client;
 
 $oclcNumber = $_GET['oclcNumber'];
 
-$url = "https://worldcat.org/circ/availability/sru/service?x-registryId=" . $_SESSION['institution'] . "&query=no:ocm" . $oclcNumber;
+$url = "https://worldcat.org/circ/availability/sru/service?x-registryId=" . $config['institution'] . "&query=no:ocm" . $oclcNumber;
 
 $client = new Client($guzzleOptions);
 
@@ -17,10 +17,9 @@ try {
     $response = \Guzzle::get($url, $guzzleOptions);
 
     // Define the namespaces for parsing
-
     $availabilityResponse = simplexml_load_string($response->getBody(true));
-    $acquisitionsAtom->registerXPathNamespace("atom", "http://www.w3.org/2005/Atom");
     $holdings = $availabilityResponse->xpath('//holdings/holding');
+    echo '<p>holding count' . count($holdings) . '</p>';
 
 } catch (\Guzzle\Http\Exception\BadResponseException $error) {
     // Or display the error, if one occurs
@@ -84,7 +83,7 @@ try {
             <td>Availablity</td>
         </tr>
         <?php
-        foreach ($holding as $holdings){
+        foreach ($holdings as $holding){
             $row = '<tr>';
             $row .= '<td>' . $holding->localLocation . '</td>';
             $row .= '<td>' . $holding->shelvingLocation . '</td>';

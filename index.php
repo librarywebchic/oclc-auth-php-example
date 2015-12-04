@@ -65,14 +65,14 @@ if (empty($_SESSION['accessToken'])) {
 }
 
 // Was there an error during the attempt to get or use an access token?
-if ($accessToken->getErrorCode()) {
+if (empty($accessToken->getValue())) {
 
     // Clear the bad token from the session memory and display the response with the error information
     unset($_SESSION['accessToken']);
     echo $accessToken->getResponse();
 
     // There is no token error, but is the token expired?
-} elseif ($accessToken->getRefreshToken()->isExpired()) {
+} elseif ($accessToken->isExpired()) {
 
     // Get a new valid token
     $accessToken = $wskey->getAccessTokenWithClientCredentials($config['institution'], $config['institution']);

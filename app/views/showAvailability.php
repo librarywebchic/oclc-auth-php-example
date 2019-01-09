@@ -1,27 +1,25 @@
 <?php
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 
 $oclcNumber = $_GET['oclcNumber'];
 
 $url = "https://worldcat.org/circ/availability/sru/service?x-registryId=" . $config['institution'] . "&query=no:ocm" . $oclcNumber;
 
-$client = new Client($guzzleOptions);
+$client = new Client();
 
 $headers = array('Authorization' => 'Bearer ' . $accessToken->getValue());
 
-// Set the guzzle headers
-$guzzleOptions['headers'] = $headers;
-
 // And execute the request (in this case a simple GET with no request body)
 try {
-    $response = \Guzzle::get($url, $guzzleOptions);
+	$response = $client->request('GET', $url, ['headers' => $headers]);
 
     // Define the namespaces for parsing
     $availabilityResponse = simplexml_load_string($response->getBody(true));
     $holdings = $availabilityResponse->xpath('//holdings/holding');
     echo '<p>holding count' . count($holdings) . '</p>';
 
-} catch (\Guzzle\Http\Exception\BadResponseException $error) {
+} catch (RequestException $error) {
     // Or display the error, if one occurs
     echo '<div class="error">';
     echo $error->getResponse()->getStatusCode();

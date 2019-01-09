@@ -19,31 +19,29 @@ use OCLC\Auth\WSKey;
 use OCLC\Auth\AuthCode;
 use OCLC\Auth\AccessToken;
 use OCLC\User;
+use Aws\Kms\KmsClient;
 
 // The global configuration object.
 // If you have not created a config.yaml file with your authentication parameters in it,
 // copy app/config/sampleConfig.yaml to app/config/config.yaml and set the parameters.
 global $config;
-$config = Yaml::parse('app/config/config.yaml');
 
+$KmsClient = new KmsClient([
+		'profile' => 'default',
+		'region' => 'us-east-1',
+		'version' => '2014-11-01'
+]);
 
-// Set the Guzzle options.
-// Guzzle makes it easy to work with restful web services.
-// http://guzzle.readthedocs.org/en/latest/
-$guzzleOptions = array(
-    'config' => array(
-        'curl' => array(
-            CURLOPT_SSLVERSION => 3
-        )
-    ),
-    'allow_redirects' => array(
-        'strict' => true
-    ),
-    'timeout' => 60
-);
-
-if (!class_exists('Guzzle')) {
-    \Guzzle\Http\StaticClient::mount();
+try {
+	$result = $KmsClient->decrypt([
+			'CiphertextBlob' => file_get_contents("app/config/prod_config_encrypted.txt"),
+	]);
+	$plaintext = $result['Plaintext'];
+	$config = Yaml::parse($plaintext);
+} catch (AwsException $e) {
+	// Output error message if fails
+	echo $e->getMessage();
+	echo "\n";
 }
 
 // We use sessions to persist our authentication between calls to the WMS Availability service.

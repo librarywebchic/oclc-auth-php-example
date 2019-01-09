@@ -13,7 +13,8 @@
 		"ext-curl" : "*",
 		"guzzle/guzzle" : ">=3.7.0,<3.9.0",
 		"symfony/yaml" : "~2.3.7",
-		"OCLC/Auth" : "*"
+		"OCLC/Auth" : "*",
+		"aws/aws-sdk-php-resources": "^0.3.0"
 	},
 	"description" : "Library to interact with OCLC's WorldCat Discovery Web Services",
 	"type" : "library",
